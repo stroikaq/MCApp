@@ -2,13 +2,13 @@ package com.example.swipingmotion;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.*;
 import android.os.Bundle;
-import android.view.GestureDetector;
+import android.view.*;
 import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 public class SwipingMotionActivity extends Activity implements OnGestureListener {
 	private GestureDetector detector; 
@@ -17,6 +17,11 @@ public class SwipingMotionActivity extends Activity implements OnGestureListener
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
     TextView tv;
+    int tracknum = 2;
+    private static final int MAX_TRACK = 3;
+    Canvas canvas = null;
+    Bitmap mMan;
+    private SurfaceHolder mSurfaceHolder;
     
     /** Called when the activity is first created. */
     @Override
@@ -29,8 +34,34 @@ public class SwipingMotionActivity extends Activity implements OnGestureListener
         
         detector = new GestureDetector(this,this);
         
-        
+        Resources mRes = this.getResources();
+        mMan = BitmapFactory.decodeResource(mRes, R.drawable.icon);
+        canvas.drawBitmap(mMan, 10, 10, null);
+        mSurfaceHolder = getHolder();
     }
+    
+
+	public void run()
+    {
+    	canvas.drawBitmap(mMan, 10, 10, null);
+    }
+    
+    public void SetTrack(boolean isRight)
+    {
+    	if(isRight)
+    	{
+    		if(tracknum < MAX_TRACK)
+    			tracknum++;
+    	}
+    	else
+    	{
+    		if(tracknum > 1)
+    			tracknum--;
+    	}
+    	tv.setText(tracknum+"");
+    	
+    }
+    
     @Override  
     public boolean onTouchEvent(MotionEvent event) {  
         return detector.onTouchEvent(event);  
@@ -71,9 +102,11 @@ public class SwipingMotionActivity extends Activity implements OnGestureListener
             if (dX>0) {
                 //Toast.makeText(getApplicationContext(), "Right Swipe", Toast.LENGTH_SHORT).show();
             	tv.setText("Right");
+            	SetTrack(true);
             } else {
                 //Toast.makeText(getApplicationContext(), "Left Swipe", Toast.LENGTH_SHORT).show();
             	tv.setText("Left");
+            	SetTrack(false);
             }
             return true;
         } else if (Math.abs(dX)<SWIPE_MAX_OFF_PATH &&
